@@ -22,7 +22,7 @@ affiliation:
 author_note: |
   Author's  contributions: SP conceived and wrote the manuscript. Throughout, AW-K provided crucial conceptual and theoretical feedback. All authors provided critical feedback to develop the final manuscript, for which all authors agreed upon.
   
-  We would like to thank Craig Hedge for making data open and available.  We would also like to thank all those that provided feedback on the preprint version of this paper (https://psyarxiv.com/6ka9z). The comments, critical feedback, and articles shared have helped to develop of this manuscript. In alphabetical order (apologies to anybody missed), we thank; James Bartlett, Paul Christiansen, Oliver Clarke, Andrew Jones, Michael Kane, Jesse Kaye, Kevin King, Mike Lawrence, Marcus Munafo, Cliodhna O'Connor, Oscar Olvera, Oliver Robinson, Guillaume Rousselet, and Bruno Zumbo.
+  We would like to thank Craig Hedge for making data open and available.  We would also like to thank all those that provided feedback on the preprint version of this paper (https://psyarxiv.com/6ka9z). The comments, critical feedback, and articles shared have helped to develop of this manuscript. In alphabetical order (apologies to anybody missed), we thank; James Bartlett, Paul Christiansen, Oliver Clarke, Pamela Davis-Kean, Andrew Jones, Michael Kane, Jesse Kaye, Rogier Kievit, Kevin King, Mike Lawrence, Marcus Munafo, Cliodhna O'Connor, Oscar Olvera, Oliver Robinson, Guillaume Rousselet, Eric-Jan Wagenmakers, and Bruno Zumbo.
   
   The data and code used to create this manuscript can be found at https://osf.io/9jp65/
   

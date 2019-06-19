@@ -117,7 +117,7 @@
 \affiliation{
 \vspace{0.5cm}
 \textsuperscript{1} Department of Experimental Psychology, University of Oxford\\\textsuperscript{2} Department of Psychology, Stockholm University}
-\keywords{reliability, estimating and reporting, cognitive-behavioural tasks, psychometrics\newline\indent Word count: 9208}
+\keywords{reliability, estimating and reporting, cognitive-behavioural tasks, psychometrics\newline\indent Word count: 9214}
 \usepackage{csquotes}
 \usepackage{upgreek}
 \captionsetup{font=singlespacing,justification=justified}
@@ -143,7 +143,7 @@
 
 \authornote{Author's contributions: SP conceived and wrote the manuscript. Throughout, AW-K provided crucial conceptual and theoretical feedback. All authors provided critical feedback to develop the final manuscript, for which all authors agreed upon.
 
-We would like to thank Craig Hedge for making data open and available. We would also like to thank all those that provided feedback on the preprint version of this paper (\url{https://psyarxiv.com/6ka9z}). The comments, critical feedback, and articles shared have helped to develop of this manuscript. In alphabetical order (apologies to anybody missed), we thank; James Bartlett, Paul Christiansen, Oliver Clarke, Andrew Jones, Michael Kane, Jesse Kaye, Kevin King, Mike Lawrence, Marcus Munafo, Cliodhna O'Connor, Oscar Olvera, Oliver Robinson, Guillaume Rousselet, and Bruno Zumbo.
+We would like to thank Craig Hedge for making data open and available. We would also like to thank all those that provided feedback on the preprint version of this paper (\url{https://psyarxiv.com/6ka9z}). The comments, critical feedback, and articles shared have helped to develop of this manuscript. In alphabetical order (apologies to anybody missed), we thank; James Bartlett, Paul Christiansen, Oliver Clarke, Pamela Davis-Kean, Andrew Jones, Michael Kane, Jesse Kaye, Rogier Kievit, Kevin King, Mike Lawrence, Marcus Munafo, Cliodhna O'Connor, Oscar Olvera, Oliver Robinson, Guillaume Rousselet, Eric-Jan Wagenmakers, and Bruno Zumbo.
 
 The data and code used to create this manuscript can be found at \url{https://osf.io/9jp65/}
 
@@ -350,13 +350,13 @@ Running this code will produce the following output. Note that estimates may dif
 
 \begin{verbatim}
   condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
-1         1 57      0.46   0.30    0.61          0.63   0.47    0.76
-2         2 57      0.39   0.24    0.54          0.56   0.38    0.70
+1         1 57      0.46   0.31    0.61          0.63   0.48    0.76
+2         2 57      0.39   0.24    0.54          0.56   0.39    0.70
 \end{verbatim}
 
 The output includes two rows, in this case one for each testing session (the \enquote{condition} column). The \enquote{n} column provides a useful check that the expected number of participants have been processed. \enquote{splithalf} provides the average splithalf reliability estimate, and \enquote{spearmanbrown} provides the Spearman-Brown corrected estimate. The remaining columns provide the lower and upper 95\% percentile intervals for both the splithalf and the Spearman-Brown corrected estimate. The output might be reported as follows;
 
-\emph{Permutation-based split-half reliability estimates were obtained, separately for each time-point using the splithalf package (version 0.5.2; Parsons, 2019) averaging the results of 5000 random splits. Reliability estimates (Spearman-Brown corrected) were; time 1: r\textsubscript{SB} = 0.63, 95\%CI {[}0.47,0.76{]} (uncorrected estimates were r = 0.46, 95\%CI {[}0.30,0.61{]}), time 2: r\textsubscript{SB} = 0.56, 95\%CI {[}0.38,0.70{]} (uncorrected estimates were r = 0.39, 95\%CI {[}0.24,0.54{]}).}
+\emph{Permutation-based split-half reliability estimates were obtained, separately for each time-point using the splithalf package (version 0.5.2; Parsons, 2019) averaging the results of 5000 random splits. Reliability estimates (Spearman-Brown corrected) were; time 1: r\textsubscript{SB} = 0.63, 95\%CI {[}0.48,0.76{]} (uncorrected estimates were r = 0.46, 95\%CI {[}0.31,0.61{]}), time 2: r\textsubscript{SB} = 0.56, 95\%CI {[}0.39,0.70{]} (uncorrected estimates were r = 0.39, 95\%CI {[}0.24,0.54{]}).}
 
 \hypertarget{test-retest-intraclass-correlation-coefficients}{%
 \subsection{Test-retest: IntraClass Correlation coefficients}\label{test-retest-intraclass-correlation-coefficients}}
