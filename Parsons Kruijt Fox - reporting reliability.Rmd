@@ -66,6 +66,18 @@ header-includes: #allows you to add in your own Latex packages
 \setlength{\belowdisplayshortskip}{3pt}
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
+# installs packages if necessary
+
+if(!"devtools" %in% rownames(installed.packages())) install.packages("devtools")
+if(!"papaja" %in% rownames(installed.packages())) devtools::install_github("crsh/papaja")
+if(!"tidyverse" %in% rownames(installed.packages())) install.packages("tidyverse")
+if(!"splithalf" %in% rownames(installed.packages())) devtools::install_github("sdparsons/splithalf")
+if(!"wordcountaddin" %in% rownames(installed.packages())) devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
+if(!"pwr" %in% rownames(installed.packages())) install.packages("pwr")
+if(!"formatR" %in% rownames(installed.packages())) install.packages("formatR")
+if(!"tufte" %in% rownames(installed.packages())) install.packages("tufte")
+if(!"psych" %in% rownames(installed.packages())) install.packages("psych")
+
 library("papaja") # required for APA formatting
 library("tidyverse") # required for data preparation
 library("pwr")
@@ -296,13 +308,13 @@ time1 <- data.frame(Block = NULL,
                     ppid = NULL)
 
 for(i in t1_list) {
-  temp <- read_csv(i,
-         col_names = c("Block",
+  temp <- read.csv(i)
+      names(temp) <- c("Block",
                        "Trial",
                        "Arrow_direction",
                        "Condition",
                        "Correct",
-                       "Reactiontime"))
+                       "Reactiontime")
   temp$ppid <- i
   time1 <- rbind(time1, temp)
 }
@@ -323,13 +335,13 @@ time2 <- data.frame(Block = NULL,
                     ppid = NULL)
 
 for(j in t2_list) {
-  temp2 <- read_csv(j,
-         col_names = c("Block",
+  temp2 <- read.csv(j)
+      names(temp2) <- c("Block",
                        "Trial",
                        "Arrow_direction",
                        "Condition",
                        "Correct",
-                       "Reactiontime"))
+                       "Reactiontime")
   temp2$ppid <- j
   time2 <- rbind(time2, temp2)
 }
@@ -340,38 +352,24 @@ time2$time <- 2
 ## we removed participants 25, 34, 38, and 54
 
 # remove superflous characters in the participant id variable
-time1$ppid <- time1$ppid %>%
-  gsub("RawData/Study1-Stroop/Study", "", .) %>%
-  gsub("RawData/Study2-Stroop/Study", "", .) %>%
-  gsub("Stroop1.csv", "", .) %>%
-  gsub("Stroop2.csv", "", .)
-
-time2$ppid <- time2$ppid %>%
-  gsub("RawData/Study1-Stroop/Study", "", .) %>%
-  gsub("RawData/Study2-Stroop/Study", "", .) %>%
-  gsub("Stroop1.csv", "", .) %>%
-  gsub("Stroop2.csv", "", .)
+time1$ppid <- sub("^.*(_P)(*.*)(Stroop1.csv).*","\\2", time1$ppid) 
+time2$ppid <- sub("^.*(_P)(*.*)(Stroop1.csv).*","\\2", time1$ppid) 
 
 # removing participants and recoding the condition variable
-time1 <- time1 %>%
-  filter(Correct   == 1, 
-         Condition != 1,
-         ppid != "P25", 
-         ppid != "P34",
-         ppid != "P38",
-         ppid != "P54") %>%
-  mutate(Condition = ifelse(Condition == 0, "congruent", "incongruent"))
+time1 <- time1[time1$Correct == 1,] # keep only correnct
+time1 <- time1[time1$Condition != 1,] # remove Condition = 0 (neutral) trials
+time1 <- time1[!time1$ppid  %in% c(25, 34, 38, 54),] # remove ppid listd to be removed
+
+time1$Condition [time1$Condition == 0] <- "congruent"
+time1$Condition [time1$Condition == 2] <- "incongruent"
 
 
-time2 <- time2 %>%
-  filter(Correct   == 1, 
-         Condition != 1,
-         ppid != "P25", 
-         ppid != "P34",
-         ppid != "P38",
-         ppid != "P54") %>%
-  mutate(Condition = ifelse(Condition == 0, "congruent", "incongruent"))
+time2 <- time2[time2$Correct == 1,] # keep only correnct
+time2 <- time2[time2$Condition != 1,] # remove Condition = 0 (neutral) trials
+time2 <- time2[!time2$ppid  %in% c(25, 34, 38, 54),] # remove ppid listd to be removed
 
+time2$Condition [time2$Condition == 0] <- "congruent"
+time2$Condition [time2$Condition == 2] <- "incongruent"
 Hedge_raw <- rbind(time1, time2)
 
 # note: the original data uses seconds for the raw data and ms for the summary data, so here we convert the raw data to millisecond
@@ -382,24 +380,17 @@ Hedge_raw$Reactiontime <- Hedge_raw$Reactiontime * 1000
 
 ```{r summary, echo = FALSE, results = 'hide'}
 # load data
-sum1 <- read.csv("SummaryData/HedgeetalReliabilityStudy1.csv") %>%
-  select(PPTID, Session1_Stroop_RTcost, Session2_Stroop_RTcost) %>%
-  mutate(study = 1)
+sum1 <- read.csv("SummaryData/HedgeetalReliabilityStudy1.csv")
+sum1 <- sum1[,c("PPTID", "Session1_Stroop_RTcost", "Session2_Stroop_RTcost")]
+sum1$study <- 1
 
-sum2 <- read.csv("SummaryData/HedgeetalReliabilityStudy2.csv") %>%
-  select(PPTID, Session1_Stroop_RTcost, Session2_Stroop_RTcost) %>%
-  mutate(study = 2)
+sum2 <- read.csv("SummaryData/HedgeetalReliabilityStudy2.csv")
+sum2 <- sum2[,c("PPTID", "Session1_Stroop_RTcost", "Session2_Stroop_RTcost")]
+sum2$study <- 2
 
-summary <- rbind(sum1, sum2) %>%
-  rename(ppid = PPTID, 
-         Stroop_1 = Session1_Stroop_RTcost,
-         Stroop_2 = Session2_Stroop_RTcost) %>%
-  filter(ppid != 25, 
-         ppid != 34,
-         ppid != 38,
-         ppid != 54)
-
-
+summary <- rbind(sum1, sum2)
+colnames(summary) <- c("ppid", "Stroop_1", "Stroop_2", "study")
+summary <- summary[!summary$ppid  %in% c(25, 34, 38, 54),]
 ```
 
 ## Internal consistency: Permutation-based split half correlations 
@@ -459,7 +450,7 @@ InternalConsistency
 
 The output includes two rows, in this case one for each testing session (the “condition” column). The “n” column provides a useful check that the expected number of participants have been processed. “splithalf” provides the average splithalf reliability estimate, and “spearmanbrown” provides the Spearman-Brown corrected estimate. The remaining columns provide the lower and upper 95% percentile intervals for both the splithalf and the Spearman-Brown corrected estimate. The output might be reported as follows;
 
-_Permutation-based split-half reliability estimates were obtained, separately for each time-point using the splithalf package  (version 0.5.2; Parsons, 2019) averaging the results of 5000 random splits. Reliability estimates were; time 1: r = `r InternalConsistency[1,3]`, 95%CI [`r InternalConsistency[1,4]`,`r InternalConsistency[1,5]`] (Spearman-Brown corrected estimates were r~SB~ = `r InternalConsistency[1,6]`, 95%CI [`r InternalConsistency[1,7]`,`r InternalConsistency[1,8]`]), time 2: r = `r InternalConsistency[2,3]`, 95%CI [`r InternalConsistency[2,4]`,`r InternalConsistency[2,5]`] (Spearman-Brown corrected estimates were r~SB~ = `r InternalConsistency[2,6]`, 95%CI [`r InternalConsistency[2,7]`,`r InternalConsistency[2,8]`])._
+_Permutation-based split-half reliability estimates were obtained, separately for each time-point using the splithalf package  (version 0.5.2; Parsons, 2019) averaging the results of 5000 random splits. Reliability estimates (Spearman-Brown corrected) were; time 1: r~SB~ = `r InternalConsistency[1,6]`, 95%CI [`r InternalConsistency[1,7]`,`r InternalConsistency[1,8]`] (uncorrected estimates were r = `r InternalConsistency[1,3]`, 95%CI [`r InternalConsistency[1,4]`,`r InternalConsistency[1,5]`]), time 2: r~SB~ = `r InternalConsistency[2,6]`, 95%CI [`r InternalConsistency[2,7]`,`r InternalConsistency[2,8]`] (uncorrected estimates were r = `r InternalConsistency[2,3]`, 95%CI [`r InternalConsistency[2,4]`,`r InternalConsistency[2,5]`])._
 
 
 ## Test-retest: IntraClass Correlation coefficients 
@@ -482,7 +473,7 @@ cor.test(summary$Stroop_1, summary$Stroop_2)
 
 Thus, from the output we observe a test-retest reliability of _r_ = `r round(stroop_cor$estimate,2)`, 95% CI [`r round(stroop_cor$conf.int[1], 2)` - `r round(stroop_cor$conf.int[2], 2)`]. Pearson’s correlation provides an easily obtained indication of the consistency between the two measurements, the value of which tends to be close to the value that would be obtained if the data was analysed more extensively using a method called variance decomposition. In variance decomposition, which is closely related to analysis of variance, the variance on the outcome measure is divided into true variance (within and/or between) and error variance which can then be used to calculate test-retest reliability as true variance / true variance + error variance. Correlation estimates obtained through variance decomposition are named IntraClass Correlation (ICC), and were first introduced by Fisher [-@fisher_statistical_1954]. An ICC taking into account only the decomposition in true and error variance reflects what is called consistency, i.e. the extent to which the individuals are ranked in the same order/pattern between the two assessments. However, it has been argued that test-retest reliability should reflect agreement, rather than consistency, between measurements [@koo_guideline_2016]. For example, a perfect correlation between scores at two time points may occur also when there is a systematic difference between time points (i.e. a difference that is about equal for all participants. For a measure that has a pre-defined boundary value this may mean that despite perfect consistency, some or all participants may be classified differently between the two assessments dependent on whether their score ended up on one or the other side of the boundary value. Imagine a scenario in which we have two measurements and the second is simply the first measurement plus a fixed amount, e.g. all participants improved by 10 on our fictional measure. This change may be a result of practice effects, development, or perhaps some other systematic difference over time. It is up to the researcher to determine the importance – and relevance to the research question – of these kinds of potential systematic changes in scores, and use this decision to guide the decision of which ICC approach is most applicable. In this case the consistency (and the correlation) would be extremely high, whereas the absolute agreement would be lower as the difference between sessions is taken into account. 
 
-In practice, there exists a multitude of ICC approaches. There are ten variations of the ICC described by McGraw and Wong [-@mcgraw_forming_1996] and six described by Shrout and Fleiss [-@shrout_intraclass_1979]. Each set of authors with their own conventions for describing the variations. In part due to these differences in conventions it can be difficult to determine which variation is most appropriate. Helpfully, Koo and Li [-@koo_guideline_2016] provide a comparison of conventions, and the relevant formulas. For the purposes of cognitive-behavioural tasks, there are two ICC variations most appropriate; ICC(2,1) and ICC(3,1) in the Shrout and Fleiss convention - these correspond to agreement and consistency, respectively. Both are based on variance decomposition using a two-way mixed-effects model of the single rater type. The primary decision for researchers is whether they are primarily concerned with the consistency (ICC3,1) or the absolute agreement (ICC2,1) of their measures as described above – though we suggest that reporting both estimates is valuable as it allows for a comparison between consistency and agreement of the measures. To illustrate the distinction beteen ICC estimates, we present the equations for each ICC below [simplified from @koo_guideline_2016]. For simplicity, 'between' refers to between-subjects variance, 'within' refers to within-subjects or between-sessions variance, and 'error' refers to error variance; finally, 'k' is the number of measurements, and 'n' is the sample size. Note that agreement (equation 6) extends consistency (equation 5) by including within-subjects variance (changes between tests) in the denominator. This causes the denominator to be larger if there is error associated with differences between sessions within participants, resulting in lower ICC estimates for agreement compared to consistency. 
+In practice, there exists a multitude of ICC approaches. There are ten variations of the ICC described by McGraw and Wong [-@mcgraw_forming_1996] and six described by Shrout and Fleiss [-@shrout_intraclass_1979]. Each set of authors with their own conventions for describing the variations. In part due to these differences in conventions it can be difficult to determine which variation is most appropriate. Helpfully, Koo and Li [-@koo_guideline_2016] provide a comparison of conventions, and the relevant formulas. We suggest that the two ICC variations most appropriate for assessing consistency and agreement in cognitive-behavioural tasks data are the ICC indicated as ICC(2,1) and ICC(3,1) in the Shrout and Fleiss convention - these correspond to agreement and consistency, respectively. Both are based on variance decomposition using a two-way mixed-effects model of the single rater type. The primary decision for researchers is whether they are primarily concerned with the consistency (ICC3,1) or the absolute agreement (ICC2,1) of their measures as described above – though we suggest that reporting both estimates is valuable as it allows for a comparison between consistency and agreement of the measures. To illustrate the distinction beteen ICC estimates, we present the equations for each ICC below. We have taken the liberty of replacing Koo & Li's  annotation (distinguishing variance obtained within columns vs within rows) with a between/within subjects annotation, in which 'between' refers to between-subjects variance, 'within' refers to within-subjects or between-sessions variance, and 'error' refers to error variance; finally, 'k' is the number of measurements, and 'n' is the sample size. Note that agreement (equation 6) extends consistency (equation 5) by including within-subjects variance (changes between tests) in the denominator. This causes the denominator to be larger if there is error associated with differences between sessions within participants, resulting in lower ICC estimates for agreement compared to consistency. 
 
 \begin{align}
 ICC(3,1) consistency=\frac{between - error}{between + (k-1)error}
@@ -496,13 +487,12 @@ Helpfully, ICCs (including 95% confidence intervals) can be estimated easily in 
 
 ```{r ICC, results, eval = FALSE}
 require(psych)
-ICC(select(summary, Stroop_1, Stroop_2))
+ICC(summary[,c("Stroop_1", "Stroop_2")])
 ```
 
 ```{r ICC2, results, echo = FALSE}
 require(psych)
-
-HedgeICC <- ICC(select(summary, Stroop_1, Stroop_2))
+HedgeICC <- ICC(summary[,c("Stroop_1", "Stroop_2")])
 ```
 
 ```{r ICC print results, echo = FALSE}
@@ -524,7 +514,7 @@ HedgeICCresults
 
 We are interested in the second and the third rows of the output, corresponding to the ICC2 (absolute agreement) and ICC3 (consistency). Researchers may be more interested in one estimate over another due to any of the reasons we discussed above, though reporting both would provide a more comprehensive picture of the measure’s reliability. The ICC column is our test-retest reliability estimate, and the final two columns are the lower and upper 95% confidence intervals around the point estimate. The ICC estimate might be reported as follows;
 
-Test-retest reliability for the Stroop task between the first and second testing session was estimated using Intraclass Correlation Coefficient (ICC; and accompanying 95% confidence intervals) using the psych package in R [@revelle_w_psych:_2017]. We report two-way mixed effects models for absolute agreement, ICC(2,1), and consistency, ICC(3,1). The estimated agreement ICC(2,1) was, ICC = `r round(HedgeICC$results[2,2], 2)`, 95% CI [`r round(HedgeICC$results[2,7], 2)`, `r round(HedgeICC$results[2,8], 2)`], and the estimated consistency was, ICC = `r round(HedgeICC$results[3,2], 2)`, 95% CI [`r round(HedgeICC$results[3,7], 2)`, `r round(HedgeICC$results[3,8], 2)`].
+_Test-retest reliability for the Stroop task between the first and second testing session was estimated using Intraclass Correlation Coefficient (ICC; and accompanying 95% confidence intervals) using the psych package in R [@revelle_w_psych:_2017]. We report two-way mixed effects models for absolute agreement, ICC(2,1), and consistency, ICC(3,1). The estimated agreement ICC(2,1) was, ICC = `r round(HedgeICC$results[2,2], 2)`, 95% CI [`r round(HedgeICC$results[2,7], 2)`, `r round(HedgeICC$results[2,8], 2)`], and the estimated consistency was, ICC = `r round(HedgeICC$results[3,2], 2)`, 95% CI [`r round(HedgeICC$results[3,7], 2)`, `r round(HedgeICC$results[3,8], 2)`]._
 
 ### Extensions of the ICC approach
 Two additional indices may be drawn from the ICC to be used to assist researchers in their interpretations, both of which are discussed in detail by Hedge et al. [-@hedge_reliability_2018]. The first involves examining the relative variances contributed by within-subjects, between-subjects, and error variances. The ICC enables researchers to examine these relative proportions of total variance. This is useful, as a single index of reliability cannot convey all of the important information that a researcher may be interested in. The relative variances may also be helpful to give an impression of where variance may be ‘spent’ on our analyses. The second involves reporting the standard error of measurement which can be calculated as the square root of error variance in the ICC calculation to reflect the 68% confidence interval for scores observed on the task. This can provide a useful indication of the degree of measurement error on individual scores as it is in the same scale as the original score. Though, the size of the SEM is perhaps less easy to apply than reliability estimates. For example, is a 20ms SEM, or a 50ms SEM, acceptable in the current paradigm? While this is an unsolved problem, reporting standard error of measurement alongside our estimates of reliability may provide further useful information to guide the interpretation of results. For instance, Hedge et al. [-@hedge_reliability_2018] note both small SEM and low reliability in their Flanker task measurements. The low SEM suggests that participants perform in a relatively similar way across sessions; yet, the low reliability suggests that participants are not similarly ranked across sessions. To ease the estimation of the relative variance, and standard error of measurement, we provide some code to extract the relative proportions of variance explained and the standard error of measurement adapted from the ICC function in the psych R package [@revelle_w_psych:_2017]. The code can be found in the markdown version of this paper in the OSF repository ([https://osf.io/9jp65/](https://osf.io/9jp65/)).  The code can be called with the function ICCdecompose; 
