@@ -1,6 +1,6 @@
 ---
 title             : "Psychological Science needs a standard practice of reporting reliabilty"
-shorttitle        : "Reporting reliability as standard"
+shorttitle        : "Routine reporting of measurement reliability"
 
 author: 
   - name          : "Sam Parsons"
@@ -414,6 +414,7 @@ require(splithalf)
 splithalf(data = Hedge_raw,
           outcome = "RT",
           score = "difference",
+          permutations = 5000,
           var.trialnum = "Trial",
           var.condition = "time",
           conditionlist = c(1, 2),
@@ -473,22 +474,25 @@ cor.test(summary$Stroop_1, summary$Stroop_2)
 
 Thus, from the output we observe a test-retest reliability of _r_ = `r round(stroop_cor$estimate,2)`, 95% CI [`r round(stroop_cor$conf.int[1], 2)` - `r round(stroop_cor$conf.int[2], 2)`]. Pearson’s correlation provides an easily obtained indication of the consistency between the two measurements, the value of which tends to be close to the value that would be obtained if the data was analysed more extensively using a method called variance decomposition. In variance decomposition, which is closely related to analysis of variance, the variance on the outcome measure is divided into true variance (within and/or between) and error variance which can then be used to calculate test-retest reliability as true variance / true variance + error variance. Correlation estimates obtained through variance decomposition are named IntraClass Correlation (ICC), and were first introduced by Fisher [-@fisher_statistical_1954]. An ICC taking into account only the decomposition in true and error variance reflects what is called consistency, i.e. the extent to which the individuals are ranked in the same order/pattern between the two assessments. However, it has been argued that test-retest reliability should reflect agreement, rather than consistency, between measurements [@koo_guideline_2016]. For example, a perfect correlation between scores at two time points may occur also when there is a systematic difference between time points (i.e. a difference that is about equal for all participants. For a measure that has a pre-defined boundary value this may mean that despite perfect consistency, some or all participants may be classified differently between the two assessments dependent on whether their score ended up on one or the other side of the boundary value. Imagine a scenario in which we have two measurements and the second is simply the first measurement plus a fixed amount, e.g. all participants improved by 10 on our fictional measure. This change may be a result of practice effects, development, or perhaps some other systematic difference over time. It is up to the researcher to determine the importance – and relevance to the research question – of these kinds of potential systematic changes in scores, and use this decision to guide the decision of which ICC approach is most applicable. In this case the consistency (and the correlation) would be extremely high, whereas the absolute agreement would be lower as the difference between sessions is taken into account. 
 
-In practice, there exists a multitude of ICC approaches. There are ten variations of the ICC described by McGraw and Wong [-@mcgraw_forming_1996] and six described by Shrout and Fleiss [-@shrout_intraclass_1979]. Each set of authors with their own conventions for describing the variations. In part due to these differences in conventions it can be difficult to determine which variation is most appropriate. Helpfully, Koo and Li [-@koo_guideline_2016] provide a comparison of conventions, and the relevant formulas. We suggest that the two ICC variations most appropriate for assessing consistency and agreement in cognitive-behavioural tasks data are the ICC indicated as ICC(2,1) and ICC(3,1) in the Shrout and Fleiss convention - these correspond to agreement and consistency, respectively. Both are based on variance decomposition using a two-way mixed-effects model of the single rater type. The primary decision for researchers is whether they are primarily concerned with the consistency (ICC3,1) or the absolute agreement (ICC2,1) of their measures as described above – though we suggest that reporting both estimates is valuable as it allows for a comparison between consistency and agreement of the measures. To illustrate the distinction beteen ICC estimates, we present the equations for each ICC below. We have taken the liberty of replacing Koo & Li's  annotation (distinguishing variance obtained within columns vs within rows) with a between/within subjects annotation, in which 'between' refers to between-subjects variance, 'within' refers to within-subjects or between-sessions variance, and 'error' refers to error variance; finally, 'k' is the number of measurements, and 'n' is the sample size. Note that agreement (equation 6) extends consistency (equation 5) by including within-subjects variance (changes between tests) in the denominator. This causes the denominator to be larger if there is error associated with differences between sessions within participants, resulting in lower ICC estimates for agreement compared to consistency. 
+In practice, there exists a multitude of ICC approaches. There are ten variations of the ICC described by McGraw and Wong [-@mcgraw_forming_1996] and six described by Shrout and Fleiss [-@shrout_intraclass_1979]. Each set of authors with their own conventions for describing the variations. In part due to these differences in conventions it can be difficult to determine which variation is most appropriate. Helpfully, Koo and Li [-@koo_guideline_2016] provide a comparison of conventions, and the relevant formulas. We suggest that the two ICC variations most appropriate for assessing consistency and agreement in cognitive-behavioural tasks data are the ICC indicated as ICC(2,1) and ICC(3,1) in the Shrout and Fleiss convention - these correspond to agreement and consistency, respectively. Both are based on variance decomposition using a two-way mixed-effects model of the single rater type. The primary decision for researchers is whether they are primarily concerned with the consistency (ICC3,1) or the absolute agreement (ICC2,1) of their measures as described above – though we suggest that reporting both estimates is valuable as it allows for a comparison between consistency and agreement of the measures. To illustrate the distinction beteen ICC estimates, we present the equations for each ICC below. We have taken the liberty of replacing Koo & Li's  annotation (distinguishing variance obtained within columns vs within rows) with a between/within subjects annotation, in which 'between' refers to between-subjects variance, 'within' refers to within-subjects or between-sessions variance, and 'error' refers to error variance; finally, 'k' is the number of measurements, and 'n' is the sample size. Note that agreement (equation 6) extends consistency (equation 5) by including within-subjects variance (changes between tests) in the denominator. This causes the denominator to be larger if there is error associated with differences between sessions within participants, resulting in lower ICC estimates for agreement compared to consistency.  
 
 \begin{align}
-ICC(3,1) consistency=\frac{between - error}{between + (k-1)error}
-\end{align}
+ICC(3,1) consistency=\frac{between - error}{between + (k-1)error}  
+\end{align}  
 
 \begin{align}
-ICC(2,1) agreement=\frac{between - error}{between + (k-1)error + \frac{k}{n}(within - error)}
-\end{align}
+ICC(2,1) agreement=\frac{between - error}{between + (k-1)error + \frac{k}{n}(within - error)}  
+\end{align}  
 
 Helpfully, ICCs (including 95% confidence intervals) can be estimated easily in R using the psych package [@revelle_w_psych:_2017]. In the code below we first load the psych package before calling the ICC function. We select data from the two available time points; “Stroop_1”, and “Stroop_2”. The standard output includes six variations of the ICC and related test statistics (note we have altered the output slightly to be more presentable in this paper).
+
 
 ```{r ICC, results, eval = FALSE}
 require(psych)
 ICC(summary[,c("Stroop_1", "Stroop_2")])
 ```
+
+\newpage
 
 ```{r ICC2, results, echo = FALSE}
 require(psych)
@@ -515,105 +519,6 @@ HedgeICCresults
 We are interested in the second and the third rows of the output, corresponding to the ICC2 (absolute agreement) and ICC3 (consistency). Researchers may be more interested in one estimate over another due to any of the reasons we discussed above, though reporting both would provide a more comprehensive picture of the measure’s reliability. The ICC column is our test-retest reliability estimate, and the final two columns are the lower and upper 95% confidence intervals around the point estimate. The ICC estimate might be reported as follows;
 
 _Test-retest reliability for the Stroop task between the first and second testing session was estimated using Intraclass Correlation Coefficient (ICC; and accompanying 95% confidence intervals) using the psych package in R [@revelle_w_psych:_2017]. We report two-way mixed effects models for absolute agreement, ICC(2,1), and consistency, ICC(3,1). The estimated agreement ICC(2,1) was, ICC = `r round(HedgeICC$results[2,2], 2)`, 95% CI [`r round(HedgeICC$results[2,7], 2)`, `r round(HedgeICC$results[2,8], 2)`], and the estimated consistency was, ICC = `r round(HedgeICC$results[3,2], 2)`, 95% CI [`r round(HedgeICC$results[3,7], 2)`, `r round(HedgeICC$results[3,8], 2)`]._
-
-### Extensions of the ICC approach
-Two additional indices may be drawn from the ICC to be used to assist researchers in their interpretations, both of which are discussed in detail by Hedge et al. [-@hedge_reliability_2018]. The first involves examining the relative variances contributed by within-subjects, between-subjects, and error variances. The ICC enables researchers to examine these relative proportions of total variance. This is useful, as a single index of reliability cannot convey all of the important information that a researcher may be interested in. The relative variances may also be helpful to give an impression of where variance may be ‘spent’ on our analyses. The second involves reporting the standard error of measurement which can be calculated as the square root of error variance in the ICC calculation to reflect the 68% confidence interval for scores observed on the task. This can provide a useful indication of the degree of measurement error on individual scores as it is in the same scale as the original score. Though, the size of the SEM is perhaps less easy to apply than reliability estimates. For example, is a 20ms SEM, or a 50ms SEM, acceptable in the current paradigm? While this is an unsolved problem, reporting standard error of measurement alongside our estimates of reliability may provide further useful information to guide the interpretation of results. For instance, Hedge et al. [-@hedge_reliability_2018] note both small SEM and low reliability in their Flanker task measurements. The low SEM suggests that participants perform in a relatively similar way across sessions; yet, the low reliability suggests that participants are not similarly ranked across sessions. To ease the estimation of the relative variance, and standard error of measurement, we provide some code to extract the relative proportions of variance explained and the standard error of measurement adapted from the ICC function in the psych R package [@revelle_w_psych:_2017]. The code can be found in the markdown version of this paper in the OSF repository ([https://osf.io/9jp65/](https://osf.io/9jp65/)).  The code can be called with the function ICCdecompose; 
-
-```{r ICC_decompose_function, eval = TRUE, echo = FALSE}
-ICCdecompose <- function(x, missing = TRUE, alpha = 0.05) 
-{
-  cl <- match.call()
-  if (is.matrix(x)) 
-    x <- data.frame(x)
-  n.obs.original <- dim(x)[1]
-  if (missing) {
-    x1 <- try(na.fail(x))
-    if (class(x1) == as.character("try-error")) {
-      x <- na.omit(x)
-      n.obs <- dim(x)[1]
-      stop("missing data were found for ", n.obs.original - 
-             n.obs, " cases \n Try again with na.omit  or set missing= FALSE and proceed at your own risk.")
-    }
-  }
-  n.obs <- dim(x)[1]
-  if (n.obs < n.obs.original) 
-    message("Warning, missing data were found for ", n.obs.original - 
-              n.obs, " cases")
-  
-  n.obs <- dim(x)[1]
-  if (n.obs < n.obs.original) 
-    message("Warning, missing data were found for ", n.obs.original - 
-              n.obs, " cases")
-  nj <- dim(x)[2]
-  x.s <- stack(x)
-  x.df <- data.frame(x.s, subs = rep(paste("S", 1:n.obs, sep = ""), 
-                                     nj))
-  aov.x <- aov(values ~ subs + ind, data = x.df)
-  s.aov <- summary(aov.x)
-  stats <- matrix(unlist(s.aov), ncol = 3, byrow = TRUE)
-  
-  
-  MSB <- stats[3, 1]
-  MSW <- (stats[2, 2] + stats[2, 3])/(stats[1, 2] + stats[1, 3])
-  MSJ <- stats[3, 2]
-  MSE <- stats[3, 3]
-  
-  # between subjects
-  BS <- (MSB - MSE) / nj
-  # error
-  ERR <- MSE
-  # between-sessions (within subjects)
-  WS <- (MSJ - MSE) / n.obs
-  
-  ICC21 <- BS / (BS + ERR + WS)
-  
-  BS_relative <- BS / (BS + ERR + WS)
-  ERR_relative <- ERR / (BS + ERR + WS)
-  WS_relative <- WS / (BS + ERR + WS)
-  
-  SEM <- sqrt(ERR)
-  
-  Fj <- MSJ/MSE
-  vn <- (nj - 1) * (n.obs - 1) * ((nj * ICC21 * Fj + n.obs * (1 + (nj - 1) * ICC21) - nj * ICC21)) ^ 2
-  vd <- (n.obs - 1) * nj ^ 2 * ICC21 ^ 2 * Fj ^ 2 + (n.obs * (1 + (nj - 1) * ICC21) - nj * ICC21) ^ 2
-  v <- vn/vd
-  
-  alpha = .05
-  F3U <- qf(1 - alpha/2, n.obs - 1, v)
-  F3L <- qf(1 - alpha/2, v, n.obs - 1)
-  
-  #lower
-  lower <- n.obs * (MSB - F3U * MSE)/(F3U * (nj * MSJ + (nj * n.obs - nj - n.obs) * MSE) + n.obs * MSB)
-  
-  #upper
-  upper <- n.obs * (F3L * MSB - MSE)/(nj * MSJ + (nj * n.obs - nj - n.obs) * MSE + n.obs * F3L * MSB)
-  
-  out <- data.frame(ICC21 = round(ICC21,2),
-                     lower = round(lower,2),
-                     upper = round(upper,2),
-                     SEM = round(SEM,2),
-                     BS_relative = round(BS_relative,2),
-                     ERR_relative = round(ERR_relative,2),
-                     WS_relative = round(WS_relative,2))
-  
-  return(out)
-  
-}
-```
-
-```{r, echo = TRUE, eval = FALSE}
-ICCdecompose(select(summary, Stroop_1, Stroop_2))
-```
-
-```{r, echo = FALSE, eval = TRUE}
-ICCdec <- ICCdecompose(select(summary, Stroop_1, Stroop_2))
-
-ICCdec
-
-#apa_table(ICCdec, caption = "ICCdecompose output")
-```
-
-The function returns the ICC(2,1) estimate, with lower and upper 95% confidence intervals. Also returned are the SEM, and the relative proportions of variance explained by between-subjects (BS_relative), error (ERR_relative), and within-subjects (WS_relative) variances.
 
 ### Other recommendations
 The chief aim of this paper is to argue for a culture change and to encourage researchers to adopt a standard practice of estimating and reporting the reliability of their measurements. There are two other related recommendations we would like to make. First, while most of our recommendations are aimed at researchers in examining the psychometrics of their own tasks, it is also the responsibility of journal editors and peer-reviewers to request psychometric information on cognitive and behavioural assessment tasks, just as they would for questionnaire measures. Similar to enforcing that authors report effect sizes and confidence intervals, or precise p values, reviewers could consider requesting psychometric evaluation of all measures used, whether they are based on self-report or other behavioural data. Indeed, reporting the psychometric properties of measurements falls clearly within APA reporting standards [@appelbaum_journal_2018, p.7]. Second, to fill the current gap in our knowledge on task reliability, we recommend that when developing novel computerised tasks (or adapting existing ones) researchers conduct validation studies for the new measures, including reporting reliability. Another possibility would be to pool data from a number of (previously published) studies to perform a meta-analytic validation. These validation studies would also be valuable in the development of reliable and valid measurements, and work such as this should be encouraged. Providing open data would further assist researchers in examining the reliability of cognitive measures where reliability is unreported. 
