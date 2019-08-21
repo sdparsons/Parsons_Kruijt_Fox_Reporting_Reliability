@@ -1,5 +1,5 @@
 ---
-title             : "Psychological Science needs a standard practice of reporting reliability"
+title             : "Psychological Science needs a standard practice of reporting the reliability of cognitive behavioural measurements"
 shorttitle        : "Routine reporting of measurement reliability"
 
 author: 
